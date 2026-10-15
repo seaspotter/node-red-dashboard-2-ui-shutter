@@ -11,12 +11,19 @@ like every external widget, it extends the core `ui-template` node and ships its
 
 ## Install
 
+Via the Node-RED editor's Palette Manager (menu -> Manage palette -> Install), search for
+`@seaspotter/node-red-dashboard-2-ui-shutter`.
+
+Or from the command line, from your Node-RED user directory (usually `~/.node-red`):
+
 ```
-npm install /path/to/node-red-dashboard-2-ui-shutter
+npm install @seaspotter/node-red-dashboard-2-ui-shutter
 ```
 
-from your Node-RED user directory (usually `~/.node-red`), then restart Node-RED. Requires Node-RED >= 3
-and `@flowfuse/node-red-dashboard` >= 1.30.
+then restart Node-RED. Requires Node-RED >= 3 and `@flowfuse/node-red-dashboard` >= 1.30.
+
+To install from a local clone instead (e.g. to try an unreleased change), use
+`npm install /path/to/node-red-dashboard-2-ui-shutter` in place of the registry install above.
 
 ## Node configuration
 
