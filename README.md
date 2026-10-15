@@ -119,13 +119,18 @@ Releases are handled by [Release Please](https://github.com/googleapis/release-p
 1. **`Prepare release`** workflow runs on every push to `main`. It reads commit history since the last
    release, maintains a standing "release PR" with the version bump and changelog, and keeps it up to
    date as more PRs land.
-2. Merging that release PR creates the `vX.Y.Z` tag and the GitHub Release.
-3. **`Publish Release`** workflow runs on that tag: builds the package, publishes it to the public npm
-   registry, then triggers a refresh on the [Node-RED Flow Library](https://flows.nodered.org/) catalogue
-   entry so the new version shows up there too.
-4. **`Lint Pull Request Title`** enforces the `<type>(<scope>): <subject>` format on every PR (`feat:` ->
+2. Merging that release PR creates the `vX.Y.Z` tag and the GitHub Release, which (in the same workflow
+   run, as a follow-up job gated on release-please's `release_created` output) builds the package,
+   publishes it to the public npm registry, then triggers a refresh on the
+   [Node-RED Flow Library](https://flows.nodered.org/) catalogue entry. This runs as a job in the same
+   workflow rather than a separate tag-triggered one, because a tag created via the default
+   `GITHUB_TOKEN` doesn't trigger other workflows.
+3. **`Lint Pull Request Title`** enforces the `<type>(<scope>): <subject>` format on every PR (`feat:` ->
    minor, `fix:`/`perf:` -> patch, `feat!:`/`fix!:` -> major, `docs:`/`chore:`/`refactor:` -> no release
    unless paired with a breaking change).
+
+`Publish Release` still exists as a manual (`workflow_dispatch`-only) rescue workflow, in case the
+automated publish job ever needs to be re-run by hand.
 
 `main` is protected: every change, including the release PR, goes through a pull request with a passing
 build.

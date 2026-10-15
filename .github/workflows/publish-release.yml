@@ -1,9 +1,15 @@
 name: Publish Release
+run-name: Manual publish (rescue)
+
+# Manual-only rescue path. The normal path is the "publish" job inside
+# Prepare release (.github/workflows/release-please.yaml): a tag push
+# created by release-please-action's default GITHUB_TOKEN does not
+# trigger other workflows (GitHub's anti-recursion rule), so a
+# `push: tags` trigger here would never actually fire. Use this only
+# to manually (re-)publish an existing tag/version, e.g. main's
+# current package.json version, if the normal path ever fails.
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - "v*.*.*"
 
 jobs:
   publish:
