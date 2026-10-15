@@ -1,0 +1,268 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ui-shutter', {
+        category: RED._('@flowfuse/node-red-dashboard/ui-base:ui-base.label.category'),
+        color: RED._('@flowfuse/node-red-dashboard/ui-base:ui-base.colors.medium'),
+        defaults: {
+            name: { value: '' },
+            group: { type: 'ui-group', required: true },
+            order: { value: -1 },
+            width: {
+                value: 0,
+                validate: function (v) {
+                    const width = v || 0
+                    const currentGroup = $('#node-input-group').val() || this.group
+                    const groupNode = RED.nodes.node(currentGroup)
+                    const valid = !groupNode || +width <= +groupNode.width
+                    $('#node-input-size').toggleClass('input-error', !valid)
+                    return valid
+                }
+            },
+            height: { value: 0 },
+            label: { value: '' },
+            showLabel: { value: true },
+            labelAlignment: { value: 'left' },
+            shutterType: { value: 'shutter' },
+            zeroMeans: { value: 'open' },
+            showGraphic: { value: true },
+            showButtons: { value: true },
+            showSlider: { value: true },
+            showPositionText: { value: true },
+            textOpen: { value: 'Open' },
+            textClosed: { value: 'Closed' },
+            color: { value: '#607d8b' },
+            skyColor: { value: '#bbdefb' },
+            buttonColor: { value: '#607d8b' },
+            buttonIconStyle: { value: 'arrow' },
+            positionProperty: { value: 'payload' },
+            slatProperty: { value: 'slats' },
+            upValue: { value: 'false' },
+            upValueType: { value: 'bool' },
+            downValue: { value: 'true' },
+            downValueType: { value: 'bool' },
+            stopValue: { value: 'true' },
+            stopValueType: { value: 'bool' },
+            topic: { value: '' }
+        },
+        inputs: 1,
+        outputs: 3,
+        outputLabels: function (index) {
+            const labels = this.shutterType === 'blind'
+                ? ['up / down', 'stop', 'position', 'slats']
+                : ['up / down', 'stop', 'position']
+            return labels[index]
+        },
+        icon: 'font-awesome/fa-window-maximize',
+        label: function () {
+            return this.name || this.label || 'ui-shutter'
+        },
+        paletteLabel: 'shutter',
+        oneditprepare: function () {
+            // re-derive the output count on load too, not just on save - otherwise a
+            // redeploy that never opens this node's edit dialog can silently truncate
+            // an existing blind's 4th (slats) wire back down to 3 outputs
+            this.outputs = this.shutterType === 'blind' ? 4 : 3
+
+            $('#node-input-size').elementSizer({
+                width: '#node-input-width',
+                height: '#node-input-height',
+                group: '#node-input-group'
+            })
+
+            $('#node-input-positionProperty').typedInput({
+                type: 'msg',
+                types: ['msg']
+            })
+
+            $('#node-input-slatProperty').typedInput({
+                type: 'msg',
+                types: ['msg']
+            })
+
+            $('#node-input-upValue').typedInput({
+                default: 'bool',
+                typeField: '#node-input-upValueType',
+                types: ['str', 'num', 'bool', 'json']
+            })
+
+            $('#node-input-downValue').typedInput({
+                default: 'bool',
+                typeField: '#node-input-downValueType',
+                types: ['str', 'num', 'bool', 'json']
+            })
+
+            $('#node-input-stopValue').typedInput({
+                default: 'bool',
+                typeField: '#node-input-stopValueType',
+                types: ['str', 'num', 'bool', 'json']
+            })
+
+            function toggleBlindRows () {
+                const isBlind = $('#node-input-shutterType').val() === 'blind'
+                $('.node-row-blind-only').toggle(isBlind)
+            }
+
+            $('#node-input-shutterType').on('change', toggleBlindRows)
+            toggleBlindRows()
+        },
+        oneditsave: function () {
+            this.outputs = this.shutterType === 'blind' ? 4 : 3
+        }
+    })
+</script>
+
+<script type="text/html" data-template-name="ui-shutter">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-group"><i class="fa fa-table"></i> Group</label>
+        <input type="text" id="node-input-group">
+    </div>
+    <div class="form-row">
+        <label><i class="fa fa-object-group"></i> Size</label>
+        <input type="hidden" id="node-input-width">
+        <input type="hidden" id="node-input-height">
+        <button class="editor-button" id="node-input-size"></button>
+    </div>
+    <div class="form-row">
+        <label for="node-input-label"><i class="fa fa-i-cursor"></i> Label</label>
+        <input type="text" id="node-input-label" placeholder="Label">
+    </div>
+    <div class="form-row">
+        <label for="node-input-showLabel" style="width: auto;">Show label</label>
+        <input type="checkbox" id="node-input-showLabel" style="display: inline-block; width: auto; vertical-align: middle;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-labelAlignment"><i class="fa fa-align-left"></i> Label alignment</label>
+        <select id="node-input-labelAlignment" style="width: 120px;">
+            <option value="left">Left</option>
+            <option value="center">Center</option>
+            <option value="right">Right</option>
+        </select>
+    </div>
+
+    <h3>Type</h3>
+    <div class="form-row">
+        <label for="node-input-shutterType"><i class="fa fa-list"></i> Type</label>
+        <select id="node-input-shutterType" style="width: 150px;">
+            <option value="shutter">Shutter</option>
+            <option value="blind">Venetian blind</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-zeroMeans"><i class="fa fa-arrows-v"></i> 0 % position means</label>
+        <select id="node-input-zeroMeans" style="width: 150px;">
+            <option value="open">Open (100 % = closed)</option>
+            <option value="closed">Closed (100 % = open)</option>
+        </select>
+    </div>
+
+    <h3>Display</h3>
+    <div class="form-row">
+        <label for="node-input-showGraphic" style="width: auto;">Show window graphic</label>
+        <input type="checkbox" id="node-input-showGraphic" style="display: inline-block; width: auto; vertical-align: middle;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-showButtons" style="width: auto;">Show up/stop/down buttons</label>
+        <input type="checkbox" id="node-input-showButtons" style="display: inline-block; width: auto; vertical-align: middle;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-showSlider" style="width: auto;">Show position slider</label>
+        <input type="checkbox" id="node-input-showSlider" style="display: inline-block; width: auto; vertical-align: middle;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-showPositionText" style="width: auto;">Show position text</label>
+        <input type="checkbox" id="node-input-showPositionText" style="display: inline-block; width: auto; vertical-align: middle;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-textOpen"><i class="fa fa-font"></i> Text "open"</label>
+        <input type="text" id="node-input-textOpen" placeholder="Open">
+    </div>
+    <div class="form-row">
+        <label for="node-input-textClosed"><i class="fa fa-font"></i> Text "closed"</label>
+        <input type="text" id="node-input-textClosed" placeholder="Closed">
+    </div>
+    <div class="form-row">
+        <label for="node-input-color"><i class="fa fa-paint-brush"></i> Cover color</label>
+        <input type="color" id="node-input-color" style="width: 60px;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-skyColor"><i class="fa fa-paint-brush"></i> Sky color</label>
+        <input type="color" id="node-input-skyColor" style="width: 60px;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-buttonColor"><i class="fa fa-paint-brush"></i> Button color</label>
+        <input type="color" id="node-input-buttonColor" style="width: 60px;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-buttonIconStyle"><i class="fa fa-square-o"></i> Button icon style</label>
+        <select id="node-input-buttonIconStyle" style="width: 150px;">
+            <option value="arrow">Arrow</option>
+            <option value="triangle">Triangle</option>
+            <option value="chevron">Chevron</option>
+        </select>
+    </div>
+
+    <h3>Inputs</h3>
+    <div class="form-row">
+        <label for="node-input-positionProperty"><i class="fa fa-sign-in"></i> Position property</label>
+        <input type="text" id="node-input-positionProperty" placeholder="payload">
+    </div>
+    <div class="form-row node-row-blind-only">
+        <label for="node-input-slatProperty"><i class="fa fa-sign-in"></i> Slat property</label>
+        <input type="text" id="node-input-slatProperty" placeholder="slats">
+    </div>
+
+    <h3>Outputs</h3>
+    <div class="form-tips">
+        Output 1 (up/down) and output 2 (stop) are configured below.
+        Output 3 (position) and - for blinds - output 4 (slats) always send the slider's number
+        (0-100) on release; there's nothing to configure for those, so they're not listed here.
+    </div>
+    <div class="form-row">
+        <label for="node-input-upValue"><i class="fa fa-sign-out"></i> Up value</label>
+        <input type="text" id="node-input-upValue" style="width: 170px;">
+        <input type="hidden" id="node-input-upValueType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-downValue"><i class="fa fa-sign-out"></i> Down value</label>
+        <input type="text" id="node-input-downValue" style="width: 170px;">
+        <input type="hidden" id="node-input-downValueType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-stopValue"><i class="fa fa-sign-out"></i> Stop value</label>
+        <input type="text" id="node-input-stopValue" style="width: 170px;">
+        <input type="hidden" id="node-input-stopValueType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-topic"><i class="fa fa-tasks"></i> Topic</label>
+        <input type="text" id="node-input-topic" placeholder="(optional)">
+    </div>
+</script>
+
+<script type="text/markdown" data-help-name="ui-shutter">
+# ui-shutter
+
+A single Dashboard 2.0 widget combining up/stop/down buttons, a position slider,
+an optional slat slider (venetian blinds) and an animated window graphic.
+
+## Inputs
+
+:position (any, number 0-100): merged into the node's stored state and shown on the widget.
+:slats (any, number 0-100, blind only): merged into the node's stored state and shown on the widget.
+
+The property names read from the input message are configurable (`positionProperty` / `slatProperty`,
+default `payload` / `slats`). Position and slats may arrive in the same message or separately -
+the node keeps the latest known value of each. Out-of-range numbers are clamped to 0-100; non-numeric
+values are ignored with a warning.
+
+## Outputs
+
+1. **up/down** - sent when the up or down button is pressed. Payload is the configured "up" or "down" value, `msg.action` is `"up"` or `"down"`.
+2. **stop** - sent when the stop button is pressed. Payload is the configured stop value, `msg.action` is `"stop"`.
+3. **position** - sent once, on release, after dragging the position slider. Payload is a number 0-100, `msg.action` is `"position"`.
+4. **slats** (blind only) - sent once, on release, after dragging the slat slider. Payload is a number 0-100, `msg.action` is `"slats"`.
+
+All outputs carry `msg.topic` when a topic is configured.
+</script>

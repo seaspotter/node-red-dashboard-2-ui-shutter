@@ -1,0 +1,59 @@
+{
+    "name": "@seaspotter/node-red-dashboard-2-ui-shutter",
+    "version": "0.1.0",
+    "description": "A Node-RED Dashboard 2.0 widget for controlling shutters and venetian blinds: up/stop/down buttons, position and slat sliders, and an animated window graphic.",
+    "keywords": [
+        "node-red",
+        "node-red-dashboard-2",
+        "shutter",
+        "blind",
+        "knx"
+    ],
+    "author": "SeaSpotter <seatowage@gmail.com>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/seaspotter/node-red-dashboard-2-ui-shutter.git"
+    },
+    "bugs": {
+        "url": "https://github.com/seaspotter/node-red-dashboard-2-ui-shutter/issues"
+    },
+    "homepage": "https://github.com/seaspotter/node-red-dashboard-2-ui-shutter#readme",
+    "exports": {
+        "import": "./resources/ui-shutter.esm.js",
+        "require": "./resources/ui-shutter.umd.js"
+    },
+    "scripts": {
+        "build": "vite build",
+        "build:dev": "NODE_ENV=development vite build",
+        "dev": "NODE_ENV=development vite build --watch",
+        "dev:prod": "vite build --watch"
+    },
+    "dependencies": {
+        "vue": "^3.3.8",
+        "vuex": "^4.1.0"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^4.5.0",
+        "vite": "^5.0.12",
+        "vite-plugin-css-injected-by-js": "^3.3.0"
+    },
+    "engines": {
+        "node": ">=14"
+    },
+    "node-red": {
+        "version": ">=3.0.0",
+        "nodes": {
+            "ui-shutter": "nodes/ui-shutter.js"
+        }
+    },
+    "node-red-dashboard-2": {
+        "version": "1.0.0",
+        "widgets": {
+            "ui-shutter": {
+                "output": "ui-shutter.umd.js",
+                "component": "UIShutter"
+            }
+        }
+    }
+}

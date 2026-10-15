@@ -1,0 +1,5 @@
+SPEC.md
+vite.config.js
+ui/
+.gitignore
+*.tgz
