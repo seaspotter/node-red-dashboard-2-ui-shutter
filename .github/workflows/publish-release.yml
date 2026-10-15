@@ -1,0 +1,46 @@
+name: Publish Release
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Publish package to public npm registry
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  update-nr-catalogue:
+    name: Update Node-RED Catalogue
+    needs: [publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get package version
+        id: getVersion
+        run: echo "version=$(jq -r .version package.json)" >> "$GITHUB_OUTPUT"
+      - name: Update Node-RED Catalogue
+        uses: flowfuse/github-actions-workflows/actions/update-nr-flows@update-nr-flows/v1
+        with:
+          package: "@seaspotter/node-red-dashboard-2-ui-shutter"
+          version: ${{ steps.getVersion.outputs.version }}
