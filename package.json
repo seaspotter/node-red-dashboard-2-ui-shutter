@@ -19,6 +19,9 @@
         "url": "https://github.com/seaspotter/node-red-dashboard-2-ui-shutter/issues"
     },
     "homepage": "https://github.com/seaspotter/node-red-dashboard-2-ui-shutter#readme",
+    "publishConfig": {
+        "access": "public"
+    },
     "exports": {
         "import": "./resources/ui-shutter.esm.js",
         "require": "./resources/ui-shutter.umd.js"
