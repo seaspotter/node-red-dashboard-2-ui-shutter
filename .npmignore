@@ -1,5 +1,7 @@
 SPEC.md
 vite.config.js
 ui/
+docs/
+examples/
 .gitignore
 *.tgz

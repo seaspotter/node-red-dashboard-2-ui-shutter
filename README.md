@@ -1,9 +1,13 @@
 # @seaspotter/node-red-dashboard-2-ui-shutter
 
-A single [Node-RED Dashboard 2.0](https://dashboard.flowfuse.com/) widget for controlling a shutter or
-venetian blind: up/stop/down buttons, a position slider, an optional slat slider, and an animated window
-graphic - all in one node, wiring straight into KNX (or any other) nodes without template/function/switch
-nodes in between.
+A single third-party [Node-RED Dashboard 2.0](https://dashboard.flowfuse.com/) widget for controlling a
+shutter or venetian blind: up/stop/down buttons, a position slider, an optional slat slider, and an
+animated window graphic - all in one node, wiring straight into KNX (or any other) nodes without
+template/function/switch nodes in between.
+
+Built against the Dashboard 2.0 [third-party widget guide](https://dashboard.flowfuse.com/contributing/widgets/third-party.html):
+like every external widget, it extends the core `ui-template` node and ships its own HTML/CSS/JS bundle
+(see [Development](#development)).
 
 ## Install
 
@@ -87,12 +91,34 @@ npm run dev          # rebuild on change
 The built UMD/ESM bundles in `resources/` are committed to the repo so the package works for consumers
 without a build step after install.
 
-## Status
+## Example
 
-Scaffolded from the structure of `@mschaeffler/node-red-dashboard-2-ui-led` per `SPEC.md`. Still to do
-before this is release-ready: local Node-RED + Dashboard test instance, the Playwright test pass described
-in `SPEC.md` section 7, and screenshots below.
+[examples/example-flow.json](examples/example-flow.json) is a self-contained flow - a shutter and a blind,
+each wired to inject/function nodes that fake a KNX round-trip (command in, status echoed back a second
+later) so you can see the widget move without any real hardware. Import it via the editor's
+*Import* dialog (hamburger menu -> Import, or `Ctrl+I`), deploy, and open the dashboard.
 
 ## Screenshots
 
-_TODO - add after the Playwright test pass._
+<img width="500" alt="Shutter and blind widgets, idle" src="docs/screenshot-idle.png">
+
+<img width="500" alt="Dragging the position slider" src="docs/screenshot-dragging.png">
+
+## Release process
+
+Releases are handled by [Release Please](https://github.com/googleapis/release-please) based on
+[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) PR titles:
+
+1. **`Prepare release`** workflow runs on every push to `main`. It reads commit history since the last
+   release, maintains a standing "release PR" with the version bump and changelog, and keeps it up to
+   date as more PRs land.
+2. Merging that release PR creates the `vX.Y.Z` tag and the GitHub Release.
+3. **`Publish Release`** workflow runs on that tag: builds the package, publishes it to the public npm
+   registry, then triggers a refresh on the [Node-RED Flow Library](https://flows.nodered.org/) catalogue
+   entry so the new version shows up there too.
+4. **`Lint Pull Request Title`** enforces the `<type>(<scope>): <subject>` format on every PR (`feat:` ->
+   minor, `fix:`/`perf:` -> patch, `feat!:`/`fix!:` -> major, `docs:`/`chore:`/`refactor:` -> no release
+   unless paired with a breaking change).
+
+`main` is protected: every change, including the release PR, goes through a pull request with a passing
+build.
