@@ -1,6 +1,6 @@
 {
     "name": "@seaspotter/node-red-dashboard-2-ui-shutter",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "A Node-RED Dashboard 2.0 widget for controlling shutters and venetian blinds: up/stop/down buttons, position and slat sliders, and an animated window graphic.",
     "keywords": [
         "node-red",
