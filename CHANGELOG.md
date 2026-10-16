@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/seaspotter/node-red-dashboard-2-ui-shutter/compare/v0.3.0...v0.3.1) (2026-10-15)
+
+
+### Bug Fixes
+
+* publish from the Prepare release workflow, not a tag trigger ([24ea6e6](https://github.com/seaspotter/node-red-dashboard-2-ui-shutter/commit/24ea6e6bd5c1893ff63ef0d226e62cd68bd9e92b))
+* publish from the Prepare release workflow, not a tag trigger ([3267280](https://github.com/seaspotter/node-red-dashboard-2-ui-shutter/commit/3267280bf1f44b6f96de7dd919c285829d1af2ac))
+
 ## [0.3.0](https://github.com/seaspotter/node-red-dashboard-2-ui-shutter/compare/v0.2.0...v0.3.0) (2026-10-15)
 
 
